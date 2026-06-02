@@ -3,10 +3,12 @@
 ## General Behaviour
 
 ### Do Not Build or Run Commands
+
 Do not run build commands (e.g. `make html`, `sphinx-build`) or any other
 shell commands unless the user explicitly asks for it.
 
 ### Do Not Edit Files Unsolicited
+
 Do not apply changes to any file unless the user explicitly asks for it.
 Propose changes in the response as text or a diff; wait for the user to
 request that the edit is applied.

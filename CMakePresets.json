@@ -1,0 +1,37 @@
+{
+  "version": 4,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0
+  },
+  "configurePresets": [
+    {
+      "name": "stm32f4-debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "${sourceDir}/cmake/arm-none-eabi.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "COCO_PLATFORM": "stm32f446"
+      }
+    },
+    {
+      "name": "stm32f4-release",
+      "inherits": "stm32f4-debug",
+      "binaryDir": "${sourceDir}/build/stm32f4-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "stm32f4-debug",
+      "configurePreset": "stm32f4-debug"
+    },
+    {
+      "name": "stm32f4-release",
+      "configurePreset": "stm32f4-release"
+    }
+  ]
+}

@@ -10,45 +10,87 @@
  */
 #pragma once
 
-#include "stm32f4xx_ll_tim.h"
+#include "coco/hal/pwm.hh"
 
 namespace servo {
+    enum class instance {
+        _1,
+    };
+
     enum class sequence_state {
         WAIT_ARMING,
         ARMING_COMPLETED,
+        RANGE_CALIBRATION,
     };
 
+    //TODO: All of these depends on the implementation for the PWM.
     inline constexpr int FrequencyHZ {50};
     inline constexpr int PeriodMs {1000/FrequencyHZ};
-    inline constexpr int MinimumPulseWidthMs {1000};
-    inline constexpr int MaximumPulseWidthMs {2000};
-    inline constexpr int WaitTimeForArmingS {5};
+    inline constexpr int MinimumPulseWidthUs {1000};
+    inline constexpr int MaximumPulseWidthUs {2000};
+    inline constexpr int WaitTimeForArmingMs {5000};
 
     struct state {
         sequence_state SequenceState {sequence_state::WAIT_ARMING};
         int CurrentThrottle {};
-        TIM_TypeDef* PWMTimer {};
+        void* PWMInstance {};
     };
 
-    inline int init(state* State) {
+    inline int init(state* State, hal::pwm_instance PWMInstance) {
         int ret {};
 
-        State->SequenceState   = sequence_state::WAIT_ARMING;
-        State->CurrentThrottle = 0;
+        State->SequenceState = sequence_state::WAIT_ARMING;
+        State->CurrentThrottle = MinimumPulseWidthUs;
+        State->PWMInstance = hal::pwm_retrieve_instance(PWMInstance);
 
-        LL_TIM_InitTypeDef TIMInit {
-            .Prescaler {},
-            .Autoreload {},
-            .ClockDivision {},
-            .RepetitionCounter {},
-        };
-        ErrorStatus status {LL_TIM_Init(State->PWMTimer, reinterpret_cast<const LL_TIM_InitTypedef*>(&TIMInit))};
+        //TODO: add the configuration in here.
+        ret = hal::pwm_init(State->PWMInstance);
 
         return ret;
     }
 
-    inline int perform_arming_sequence(state* State);
-    inline int change_throttle(state* State, int Throttle);
-    inline int throttle_range_calibration(state* State);
+    inline int change_throttle(state* State, int ThrottlePercentage) {
+        if ((State->SequenceState != sequence_state::ARMING_COMPLETED) && (State->SequenceState != sequence_state::RANGE_CALIBRATION)) {
+            return -1;
+        }
+
+        if ((ThrottlePercentage < 0) || (ThrottlePercentage > 100)) {
+            return -1;
+        }
+
+        State->CurrentThrottle = ThrottlePercentage;
+
+        int PulseWidthUs {MinimumPulseWidthUs + ThrottlePercentage * (MaximumPulseWidthUs - MinimumPulseWidthUs) / 100};
+
+        int ret {hal::pwm_change_pulse_width(State->PWMInstance, PulseWidthUs)};
+
+        return ret;
+    }
+
+    inline int perform_arming_sequence(state* State) {
+        if (State->SequenceState != sequence_state::WAIT_ARMING) {
+            return -1;
+        }
+
+        //Wait for WaitTimeForArmingMs milliseconds with the fixed state of the throttle.
+        return 0;
+    }
+
+    inline int throttle_range_calibration(state* State) {
+        //TODO: Should i have a range calibration state.
+        State->SequenceState = sequence_state::RANGE_CALIBRATION;
+        int ret {change_throttle(State, 100)};
+        if (ret != 0) {
+            return ret;
+        }
+
+        //TODO: sleep for WaitTimeForArmingMs.
+
+        change_throttle(State, 0);
+        //TODO: sleep for WaitTimeForArmingMs.
+
+        return 0;
+    }
+
 } /* namespace servo */
 

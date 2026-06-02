@@ -290,20 +290,35 @@ Throttle Range Calibration
 ===========================
 
 Calibration teaches the ESC the exact minimum and maximum pulse widths of
-your transmitter or signal source.
+your transmitter or signal source. It must be performed before the very
+first arming sequence and is typically a one-time bench setup step; the
+ESC stores the endpoints in non-volatile memory and retains them across
+power cycles.
+
+Because the ESC needs to see the maximum throttle signal at the moment it
+receives power, the controller must be outputting 2000 µs before the ESC
+boots. When both share the same battery (via the BEC), power the controller
+separately (e.g. via USB) so it is already running and outputting maximum
+throttle before the ESC is powered on.
+
+.. note::
+   The arming sequence does not apply during calibration. The ESC enters a
+   dedicated calibration mode and does not check for the low-throttle hold
+   that arming normally requires.
 
 .. code-block:: text
 
-   Step 1: Set signal to 2000 µs (full throttle)
-   Step 2: Connect the LiPo battery
-   Step 3: Wait for confirmation beeps (usually 2 short beeps)
-   Step 4: Immediately set signal to 1000 µs (low throttle)
-   Step 5: Wait for confirmation beeps
-   Step 6: Calibration complete ✓
+   Step 1: Power the controller separately (e.g. via USB)
+   Step 2: Set signal to 2000 µs (full throttle)
+   Step 3: Connect the LiPo battery
+   Step 4: Wait for confirmation beeps (usually 2 short beeps)
+   Step 5: Set signal to 1000 µs (low throttle)
+   Step 6: Wait for confirmation beeps
+   Step 7: Calibration complete; normal arming applies from this point on
 
 .. note::
-   Calibration is stored in the ESC's non-volatile memory and only needs to
-   be repeated if you change your transmitter, servo tester, or signal source.
+   Calibration only needs to be repeated if you change your transmitter,
+   servo tester, or signal source.
 
 --------
 
