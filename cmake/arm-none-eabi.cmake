@@ -16,9 +16,6 @@ set(CMAKE_ASM_FLAGS_INIT "${CPU_FLAGS} -x assembler-with-cpp")
 set(CMAKE_OBJCOPY ${TOOLCHAIN_PREFIX}objcopy)
 set(CMAKE_SIZE    ${TOOLCHAIN_PREFIX}size)
 
-set(CMAKE_SYSROOT        /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi)
-set(CMAKE_FIND_ROOT_PATH /opt/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/lib)
-
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)

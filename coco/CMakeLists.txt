@@ -12,6 +12,12 @@ endif()
 
 add_library(coco STATIC)
 
+target_link_libraries(coco
+    PRIVATE
+        drone_warnings
+        drone_options
+)
+
 target_include_directories(coco
     PUBLIC
         include
@@ -26,3 +32,4 @@ target_compile_options(coco
 
 add_subdirectory(third_party)
 add_subdirectory(platform/${COCO_PLATFORM})
+
