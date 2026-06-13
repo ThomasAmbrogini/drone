@@ -11,6 +11,7 @@
                 "DRONE_C_FLAGS": "-ffreestanding",
                 "DRONE_CXX_FLAGS": "-fno-rtti -fno-exceptions",
                 "DRONE_EXE_LINKER_FLAGS": "-nostdlib",
+                "DRONE_LINKER_FILE_PATH": "${sourceDir}/linker/STM32F446RETx_FLASH.ld",
 
                 "COCO_PLATFORM": "stm32f446"
             }
@@ -25,8 +26,18 @@
                 "DRONE_C_FLAGS": "-ffreestanding",
                 "DRONE_CXX_FLAGS": "-fno-rtti -fno-exceptions",
                 "DRONE_EXE_LINKER_FLAGS": "-nostdlib",
+                "DRONE_LINKER_FILE_PATH": "${sourceDir}/linker/STM32F446RETx_FLASH.ld",
 
                 "COCO_PLATFORM": "stm32f446"
+            }
+        },
+        {
+            "name": "linux_debug",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+
+                "COCO_PLATFORM": "linux"
             }
         }
     ],
@@ -38,6 +49,10 @@
         {
             "name": "stm32f4_release",
             "configurePreset": "stm32f4_release"
+        },
+        {
+            "name": "linux_debug",
+            "configurePreset": "linux_debug"
         }
     ]
 }

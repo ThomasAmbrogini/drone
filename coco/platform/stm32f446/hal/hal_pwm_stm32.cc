@@ -3,7 +3,7 @@
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_tim.h"
 
-namespace hal {
+namespace coco {
 
 void* pwm_retrieve_instance(pwm_instance Instance) {
     switch (Instance) {
@@ -68,4 +68,13 @@ int pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
     return 0;
 }
 
-} /* namespace hal */
+int pwm_get(void* PWMInstance, pwm_configuration& PWMConfig) {
+    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
+    uint32_t prescaler = LL_TIM_GetPrescaler(Timer) + 1;
+    PWMConfig.PulseWidthUs = static_cast<int>(
+        static_cast<uint64_t>(LL_TIM_OC_GetCompareCH1(Timer)) * prescaler * 1000000UL / SystemCoreClock
+    );
+    return 0;
+}
+
+} /* namespace coco */

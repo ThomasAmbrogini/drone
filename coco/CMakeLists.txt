@@ -14,6 +14,7 @@ add_library(coco STATIC)
 
 target_link_libraries(coco
     PRIVATE
+        #TODO: maybe i can create my own options for this project in here.
         drone_warnings
         drone_options
 )
@@ -23,13 +24,5 @@ target_include_directories(coco
         include
 )
 
-target_compile_options(coco
-    PRIVATE
-        -ffreestanding
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
-)
-
-add_subdirectory(third_party)
 add_subdirectory(platform/${COCO_PLATFORM})
 

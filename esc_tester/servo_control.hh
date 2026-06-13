@@ -36,15 +36,15 @@ namespace servo {
         void* PWMInstance {};
     };
 
-    inline int init(state* State, hal::pwm_instance PWMInstance) {
+    inline int init(state* State, coco::pwm_instance PWMInstance) {
         int ret {};
 
         State->SequenceState = sequence_state::WAIT_ARMING;
         State->CurrentThrottle = MinimumPulseWidthUs;
-        State->PWMInstance = hal::pwm_retrieve_instance(PWMInstance);
+        State->PWMInstance = coco::pwm_retrieve_instance(PWMInstance);
 
         //TODO: add the configuration in here.
-        ret = hal::pwm_init(State->PWMInstance);
+        ret = coco::pwm_init(State->PWMInstance);
 
         return ret;
     }
@@ -62,7 +62,7 @@ namespace servo {
 
         int PulseWidthUs {MinimumPulseWidthUs + ThrottlePercentage * (MaximumPulseWidthUs - MinimumPulseWidthUs) / 100};
 
-        int ret {hal::pwm_change_pulse_width(State->PWMInstance, PulseWidthUs)};
+        int ret {coco::pwm_change_pulse_width(State->PWMInstance, PulseWidthUs)};
 
         return ret;
     }

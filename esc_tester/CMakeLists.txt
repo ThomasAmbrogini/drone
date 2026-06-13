@@ -1,6 +1,7 @@
-add_executable(esc_tester.elf main.cc)
+set(ESC_TESTER_NAME esc_tester)
+add_executable(${ESC_TESTER_NAME}.elf main.cc)
 
-target_link_libraries(esc_tester.elf
+target_link_libraries(${ESC_TESTER_NAME}.elf
     PRIVATE
         drone_options
         drone_warnings
@@ -9,8 +10,14 @@ target_link_libraries(esc_tester.elf
         coco
 )
 
-target_link_options(esc_tester.elf
+target_link_options(${ESC_TESTER_NAME}.elf
     PRIVATE
-        -T${CMAKE_CURRENT_SOURCE_DIR}/linker/STM32F446RETx_FLASH.ld
-        -Wl,-Map=esc_tester.map
+        LINKER:-Map=${ESC_TESTER_NAME}.map
 )
+
+if (DRONE_LINKER_FILE_PATH)
+    target_link_options(${ESC_TESTER_NAME}.elf
+        PRIVATE
+            -T${DRONE_LINKER_FILE_PATH}
+    )
+endif()
