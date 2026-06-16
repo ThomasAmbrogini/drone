@@ -55,26 +55,49 @@ int pwm_init(void* PWMInstance) {
     return 0;
 }
 
+pwm_configuration pwm_get(void* PWMInstance) {
+    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
+    uint32_t Prescaler {LL_TIM_GetPrescaler(Timer) + 1};
+
+    return pwm_configuration {
+        .Enabled {LL_TIM_IsEnabledCounter(Timer) && LL_TIM_CC_IsEnabledChannel(Timer, LL_TIM_CHANNEL_CH1)},
+        .PeriodUs {static_cast<int>(static_cast<uint64_t>(LL_TIM_GetAutoReload(Timer) + 1) * Prescaler * 1000000UL / SystemCoreClock)},
+        .PulseWidthUs {static_cast<int>(static_cast<uint64_t>(LL_TIM_OC_GetCompareCH1(Timer)) * Prescaler * 1000000UL / SystemCoreClock)},
+    };
+}
+
+void pwm_enable(void* PWMInstance) {
+    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
+    LL_TIM_CC_EnableChannel(Timer, LL_TIM_CHANNEL_CH1);
+    LL_TIM_EnableCounter(Timer);
+}
+
+void pwm_disable(void* PWMInstance) {
+    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
+    LL_TIM_CC_DisableChannel(Timer, LL_TIM_CHANNEL_CH1);
+    LL_TIM_DisableCounter(Timer);
+}
+
 // Assumes the timer input clock equals SystemCoreClock (APB prescaler = 1).
 // If the timer is on an APB bus with a prescaler > 1, replace SystemCoreClock
 // with the actual timer input clock (2 * APBx clock on STM32F4).
-int pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
-    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
-    uint32_t prescaler = LL_TIM_GetPrescaler(Timer) + 1;
-    uint32_t compare = static_cast<uint32_t>(
-        static_cast<uint64_t>(PulseWidthUs) * SystemCoreClock / prescaler / 1000000UL
-    );
-    LL_TIM_OC_SetCompareCH1(Timer, compare);
-    return 0;
+void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
+    //TODO: assert that all the values are correct.
+    TIM_TypeDef* Timer {static_cast<TIM_TypeDef*>(PWMInstance)};
+
+    uint32_t Prescaler {LL_TIM_GetPrescaler(Timer) + 1};
+    uint32_t Compare {static_cast<uint32_t>(static_cast<uint64_t>(PulseWidthUs) * SystemCoreClock / Prescaler / 1000000UL)};
+    LL_TIM_OC_SetCompareCH1(Timer, Compare);
 }
 
-int pwm_get(void* PWMInstance, pwm_configuration& PWMConfig) {
-    TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
-    uint32_t prescaler = LL_TIM_GetPrescaler(Timer) + 1;
-    PWMConfig.PulseWidthUs = static_cast<int>(
-        static_cast<uint64_t>(LL_TIM_OC_GetCompareCH1(Timer)) * prescaler * 1000000UL / SystemCoreClock
-    );
-    return 0;
+void pwm_change_period(void* PWMInstance, int PeriodUs) {
+    //TODO: assert that all the values are correct.
+    TIM_TypeDef* Timer {static_cast<TIM_TypeDef*>(PWMInstance)};
+
+    uint32_t Prescaler {LL_TIM_GetPrescaler(Timer) + 1};
+    uint32_t Autoreload {static_cast<uint32_t>(static_cast<uint64_t>(PeriodUs) * SystemCoreClock / Prescaler / 1000000) - 1};
+
+    LL_TIM_SetAutoReload(Timer, Autoreload);
 }
 
 } /* namespace coco */

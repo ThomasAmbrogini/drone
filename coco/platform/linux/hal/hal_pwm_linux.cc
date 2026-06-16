@@ -6,6 +6,8 @@ namespace coco {
 
 struct pwm_mock {
     const char* Name {};
+    bool Enabled {};
+    int PeriodUs {};
     int PulseWidthUs {};
 };
 
@@ -36,16 +38,33 @@ int pwm_init(void* PWMInstance) {
     return 0;
 }
 
-int pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
+pwm_configuration pwm_get(void* PWMInstance) {
     pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
-    MockPWMInstance->PulseWidthUs = PulseWidthUs;
-    return 0;
+    return pwm_configuration {
+        .Enabled {MockPWMInstance->Enabled},
+        .PeriodUs {MockPWMInstance->PeriodUs},
+        .PulseWidthUs {MockPWMInstance->PulseWidthUs},
+    };
 }
 
-int pwm_get(void* PWMInstance, pwm_configuration& PWMConfiguration) {
+void pwm_enable(void* PWMInstance) {
     pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
-    PWMConfiguration.PulseWidthUs = MockPWMInstance->PulseWidthUs;
-    return 0;
+    MockPWMInstance->Enabled = true;
+}
+
+void pwm_disable(void* PWMInstance) {
+    pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
+    MockPWMInstance->Enabled = false;
+}
+
+void pwm_change_period(void* PWMInstance, int PeriodUs) {
+    pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
+    MockPWMInstance->PeriodUs = PeriodUs;
+}
+
+void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
+    pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
+    MockPWMInstance->PulseWidthUs = PulseWidthUs;
 }
 
 } /* namespace coco */

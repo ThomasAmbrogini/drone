@@ -7,6 +7,8 @@ enum class pwm_instance {
 };
 
 struct pwm_configuration {
+    bool Enabled {};
+    int PeriodUs {};
     int PulseWidthUs {};
 };
 
@@ -14,9 +16,15 @@ void* pwm_retrieve_instance(pwm_instance Instance);
 
 int pwm_init(void* PWMInstance);
 
-int pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs);
+pwm_configuration pwm_get(void* PWMInstance);
 
-int pwm_get(void* PWMInstance, pwm_configuration& PWMConfiguration);
+void pwm_enable(void* PWMInstance);
+
+void pwm_disable(void* PWMInstance);
+
+void pwm_change_period(void* PWMInstance, int PeriodUs);
+
+void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs);
 
 } /* namespace coco */
 
