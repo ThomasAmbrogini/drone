@@ -1,5 +1,7 @@
 #include "coco/hal/pwm.hh"
 
+#include "coco/assert.hh"
+
 #include "stm32f4xx_ll_bus.h"
 #include "stm32f4xx_ll_tim.h"
 
@@ -13,6 +15,8 @@ void* pwm_retrieve_instance(pwm_instance Instance) {
 }
 
 int pwm_init(void* PWMInstance) {
+    assert(PWMInstance);
+
     TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
 
     //TODO: this should not be done in here.
@@ -56,6 +60,9 @@ int pwm_init(void* PWMInstance) {
 }
 
 pwm_configuration pwm_get(void* PWMInstance) {
+    assert(PWMInstance);
+    assert(LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_TIM5));
+
     TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
     uint32_t Prescaler {LL_TIM_GetPrescaler(Timer) + 1};
 
@@ -67,12 +74,18 @@ pwm_configuration pwm_get(void* PWMInstance) {
 }
 
 void pwm_enable(void* PWMInstance) {
+    assert(PWMInstance);
+    assert(LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_TIM5));
+
     TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
     LL_TIM_CC_EnableChannel(Timer, LL_TIM_CHANNEL_CH1);
     LL_TIM_EnableCounter(Timer);
 }
 
 void pwm_disable(void* PWMInstance) {
+    assert(PWMInstance);
+    assert(LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_TIM5));
+
     TIM_TypeDef* Timer = static_cast<TIM_TypeDef*>(PWMInstance);
     LL_TIM_CC_DisableChannel(Timer, LL_TIM_CHANNEL_CH1);
     LL_TIM_DisableCounter(Timer);
@@ -82,6 +95,9 @@ void pwm_disable(void* PWMInstance) {
 // If the timer is on an APB bus with a prescaler > 1, replace SystemCoreClock
 // with the actual timer input clock (2 * APBx clock on STM32F4).
 void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
+    assert(PWMInstance);
+    assert(LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_TIM5));
+
     //TODO: assert that all the values are correct.
     TIM_TypeDef* Timer {static_cast<TIM_TypeDef*>(PWMInstance)};
 
@@ -91,13 +107,18 @@ void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
 }
 
 void pwm_change_period(void* PWMInstance, int PeriodUs) {
+    assert(PWMInstance);
+    assert(LL_APB1_GRP1_IsEnabledClock(LL_APB1_GRP1_PERIPH_TIM5));
+
     //TODO: assert that all the values are correct.
     TIM_TypeDef* Timer {static_cast<TIM_TypeDef*>(PWMInstance)};
 
     uint32_t Prescaler {LL_TIM_GetPrescaler(Timer) + 1};
-    uint32_t Autoreload {static_cast<uint32_t>(static_cast<uint64_t>(PeriodUs) * SystemCoreClock / Prescaler / 1000000) - 1};
+    uint32_t Autoreload {static_cast<uint32_t>(static_cast<uint64_t>(PeriodUs) * SystemCoreClock / Prescaler / 1000000)};
+    assert(Autoreload > 0);
+    uint32_t AutoreloadRegister {Autoreload - 1};
 
-    LL_TIM_SetAutoReload(Timer, Autoreload);
+    LL_TIM_SetAutoReload(Timer, AutoreloadRegister);
 }
 
 } /* namespace coco */
