@@ -10,7 +10,6 @@ int main() {
 
     auto PWMInstance {coco::pwm_retrieve_instance(coco::pwm_instance::_1)};
     coco::pwm_init(PWMInstance);
-    coco::pwm_enable(PWMInstance);
 
     return 5;
 }

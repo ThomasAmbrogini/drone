@@ -12,19 +12,24 @@ struct pwm_configuration {
     int PulseWidthUs {};
 };
 
-void* pwm_retrieve_instance(pwm_instance Instance);
+struct pwm_handle {
+    void* PWMInstance {};
+    int PWMChannel {};
+};
 
-int pwm_init(void* PWMInstance);
+pwm_handle* pwm_retrieve_instance(pwm_instance Instance);
 
-pwm_configuration pwm_get(void* PWMInstance);
+int pwm_init(pwm_handle* PWMHandle);
 
-void pwm_enable(void* PWMInstance);
+pwm_configuration pwm_get(pwm_handle* PWMHandle);
 
-void pwm_disable(void* PWMInstance);
+void pwm_enable(pwm_handle* PWMHandle);
 
-void pwm_change_period(void* PWMInstance, int PeriodUs);
+void pwm_disable(pwm_handle* PWMHandle);
 
-void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs);
+void pwm_change_period(pwm_handle* PWMHandle, int PeriodUs);
+
+void pwm_change_pulse_width(pwm_handle* PWMHandle, int PulseWidthUs);
 
 } /* namespace coco */
 

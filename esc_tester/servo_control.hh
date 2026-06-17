@@ -30,7 +30,7 @@ inline constexpr int WaitTimeForArmingMs {5000};
 struct state {
     sequence_state SequenceState {sequence_state::WAIT_ARMING};
     int CurrentThrottle {};
-    void* PWMInstance {};
+    coco::pwm_handle* PWMHandle {};
 };
 
 namespace details {
@@ -38,7 +38,7 @@ namespace details {
 inline void _change_throttle(state* State, int ThrottlePercentage) {
     State->CurrentThrottle = ThrottlePercentage;
     int PulseWidthUs {MinimumPulseWidthUs + ThrottlePercentage * (MaximumPulseWidthUs - MinimumPulseWidthUs) / 100};
-    coco::pwm_change_pulse_width(State->PWMInstance, PulseWidthUs);
+    coco::pwm_change_pulse_width(State->PWMHandle, PulseWidthUs);
 }
 
 } /* namespace details */;
@@ -48,18 +48,18 @@ inline int init(state* State, coco::pwm_instance PWMInstance) {
 
     State->SequenceState = sequence_state::WAIT_ARMING;
     State->CurrentThrottle = 0;
-    State->PWMInstance = coco::pwm_retrieve_instance(PWMInstance);
+    State->PWMHandle = coco::pwm_retrieve_instance(PWMInstance);
 
-    ret = {coco::pwm_init(State->PWMInstance)};
+    ret = {coco::pwm_init(State->PWMHandle)};
     if (ret != 0) {
         return -1;
     }
 
-    coco::pwm_change_period(State->PWMInstance, (1000000 / FrequencyHZ));
+    coco::pwm_change_period(State->PWMHandle, (1000000 / FrequencyHZ));
     details::_change_throttle(State, 0);
 
     //TODO: should I enable the PWM?
-    coco::pwm_enable(State->PWMInstance);
+    coco::pwm_enable(State->PWMHandle);
 
     //TODO: maybe the arming sequence can be done in here since I have to do it at the start anyway.
 
