@@ -1,6 +1,6 @@
 #include "coco/hal/pwm.hh"
 
-#include "coco/assert.hh"
+#include "coco/assert.h"
 
 #include <cstdio>
 
@@ -35,7 +35,7 @@ void* pwm_retrieve_instance(pwm_instance Instance) {
 }
 
 int pwm_init(void* PWMInstance) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {reinterpret_cast<pwm_mock*>(PWMInstance)};
     printf("PWM Instance name: %s\n", MockPWMInstance->Name);
@@ -43,7 +43,7 @@ int pwm_init(void* PWMInstance) {
 }
 
 pwm_configuration pwm_get(void* PWMInstance) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {static_cast<pwm_mock*>(PWMInstance)};
     return pwm_configuration {
@@ -54,28 +54,28 @@ pwm_configuration pwm_get(void* PWMInstance) {
 }
 
 void pwm_enable(void* PWMInstance) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {static_cast<pwm_mock*>(PWMInstance)};
     MockPWMInstance->Enabled = true;
 }
 
 void pwm_disable(void* PWMInstance) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {static_cast<pwm_mock*>(PWMInstance)};
     MockPWMInstance->Enabled = false;
 }
 
 void pwm_change_period(void* PWMInstance, int PeriodUs) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {static_cast<pwm_mock*>(PWMInstance)};
     MockPWMInstance->PeriodUs = PeriodUs;
 }
 
 void pwm_change_pulse_width(void* PWMInstance, int PulseWidthUs) {
-    assert(PWMInstance);
+    COCO_ASSERT(PWMInstance);
 
     pwm_mock* MockPWMInstance {static_cast<pwm_mock*>(PWMInstance)};
     MockPWMInstance->PulseWidthUs = PulseWidthUs;

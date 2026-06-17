@@ -9,11 +9,8 @@ int main() {
     os::sleep_busy_wait_ms(1000);
 
     auto PWMInstance {coco::pwm_retrieve_instance(coco::pwm_instance::_1)};
-    coco::pwm_init(nullptr);
-
-    while (true) {
-        int a {5 + 10};
-    }
+    coco::pwm_init(PWMInstance);
+    coco::pwm_enable(PWMInstance);
 
     return 5;
 }
